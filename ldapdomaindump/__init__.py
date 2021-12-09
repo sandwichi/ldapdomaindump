@@ -25,6 +25,7 @@ from __future__ import unicode_literals
 import sys, os, re, codecs, json, argparse, getpass, base64
 # import class and constants
 from datetime import datetime, timedelta
+from pytz import timezone
 try:
     from urllib.parse import quote_plus
 except ImportError:
@@ -565,6 +566,10 @@ class reportWriter(object):
         if not os.path.exists(self.config.basepath):
             os.makedirs(self.config.basepath)
         outfile = os.path.join(self.config.basepath, rel_outfile)
+        if 'domain_policy.json' in outfile:
+            jsondata = json.loads(jsondata)
+            jsondata[0]['execution_timestamp'] = datetime.now(timezone('EST')).isoformat()
+            jsondata = json.dumps(jsondata)
         with codecs.open(outfile, 'w', 'utf8') as of:
             #If the generator is not specified, we should write the JSON blob directly
             if genfunc is None:
